@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Menu</title>
+<style>
+/* ============================================================
+   SYSTEM FONTS ONLY — no external fonts, works fully offline.
+   ============================================================ */
+:root{
+  --primary:#1b6b3a; --accent:#c9a227; --bg:#f6f4ee; --text:#1e1e1e;
+  --card:#ffffff; --muted:#6b6b6b; --line:#e8e4d8;
+  --wa:#25d366; --danger:#d64545;
+  --radius:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans",Arial,sans-serif;background:var(--bg);color:var(--text);padding-bottom:170px}
+img{max-width:100%}
+button{font-family:inherit}
+
+/* ---------- Header ---------- */
+.hdr{position:sticky;top:0;z-index:40;background:linear-gradient(135deg,var(--primary),var(--primary) 55%,var(--accent) 160%);color:#fff;padding:14px 16px 18px;border-radius:0 0 22px 22px;box-shadow:0 4px 18px rgba(0,0,0,.18)}
+.hdr-row{display:flex;align-items:center;gap:12px}
+.badge{width:56px;height:56px;min-width:56px;border-radius:18px;background:rgba(255,255,255,.16);border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:26px;color:#fff;overflow:hidden}
+.badge img{width:100%;height:100%;object-fit:cover}
+.hdr h1{margin:0;font-size:20px;letter-spacing:.2px}
+.hdr .tag{margin:2px 0 0;font-size:12.5px;opacity:.92;font-weight:500}
+.gear{margin-left:auto;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.45);border-radius:12px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff}
+.gear svg{width:22px;height:22px}
+
+/* ---------- Search ---------- */
+.search-wrap{padding:12px 16px 0}
+.search{display:flex;align-items:center;gap:8px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:0 12px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.search svg{width:20px;height:20px;flex:none;color:var(--muted)}
+.search input{border:0;outline:0;flex:1;height:48px;font-size:16px;background:transparent;color:var(--text)}
+
+/* ---------- Category tabs ---------- */
+.cats{position:sticky;top:0;z-index:30;background:var(--bg);padding:10px 12px;display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;border-bottom:1px solid var(--line)}
+.cat{flex:none;border:1.5px solid var(--line);background:var(--card);color:var(--text);border-radius:999px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;min-height:44px}
+.cat.active{background:var(--primary);border-color:var(--primary);color:#fff}
+
+/* ---------- Items ---------- */
+.sec-title{padding:16px 16px 6px;font-size:16px;font-weight:800;display:flex;align-items:center;gap:8px}
+.sec-title .dot{width:8px;height:8px;border-radius:50%;background:var(--accent)}
+.item{background:var(--card);margin:8px 14px;border-radius:var(--radius);padding:14px 14px 12px;box-shadow:0 2px 10px rgba(0,0,0,.06);border:1px solid var(--line)}
+.item-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.item-name{font-size:16px;font-weight:700;margin:0}
+.pop{display:inline-block;font-size:10.5px;font-weight:700;color:#fff;background:var(--accent);border-radius:6px;padding:2px 7px;margin-left:6px;vertical-align:middle}
+.item-desc{margin:5px 0 0;font-size:13px;color:var(--muted);line-height:1.45}
+.item-row{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.price{font-size:17px;font-weight:800;color:var(--primary)}
+.stepper{display:flex;align-items:center;gap:2px;background:var(--bg);border:1.5px solid var(--line);border-radius:999px;padding:3px}
+.stepper button{width:40px;height:40px;border-radius:50%;border:0;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.stepper button svg{width:18px;height:18px}
+.stepper .minus{background:#fff;color:var(--primary);border:1.5px solid var(--primary)}
+.qty{min-width:30px;text-align:center;font-weight:800;font-size:16px}
+.empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px}
+
+/* ---------- Sticky cart bar ---------- */
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);border-top:2px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -6px 20px rgba(0,0,0,.1)}
+.tbl-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.tbl-row label{font-size:13.5px;font-weight:700}
+.tbl-row .helper{font-size:12px;color:var(--muted);display:block;font-weight:400}
+select#tableSel{height:48px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;padding:0 12px;background:var(--bg);color:var(--text);min-width:110px;font-weight:700}
+.wa-btn{width:100%;min-height:56px;border:0;border-radius:14px;background:var(--wa);color:#fff;font-size:17px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;box-shadow:0 4px 14px rgba(37,211,102,.4)}
+.wa-btn svg{width:26px;height:26px;flex:none}
+.wa-btn .sub{display:block;font-size:12px;font-weight:500;opacity:.95}
+.cartbar .total-line{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin:2px 0 8px}
+.cart-empty-hint{font-size:12.5px;color:var(--muted);text-align:center;padding:6px 0 2px}
+
+/* ---------- Cart items summary ---------- */
+.cartlist{max-height:180px;overflow-y:auto;margin:0 0 8px;border:1.5px solid var(--line);border-radius:12px;display:none}
+.cartlist.open{display:block}
+.cartlist .cl{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;font-size:13.5px;border-bottom:1px solid var(--line)}
+.cartlist .cl:last-child{border-bottom:0}
+
+/* ---------- Demo switcher (hidden unless ?demo in URL) ---------- */
+#demoBar{display:none;background:#222;color:#fff;font-size:13px;padding:8px 12px;gap:8px;align-items:center;position:sticky;top:0;z-index:60}
+#demoBar.show{display:flex}
+#demoBar button{flex:1;min-height:44px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
+#demoBar .d1{background:#1b6b3a;color:#fff}
+#demoBar .d2{background:#b3261e;color:#fff}
+
+/* ---------- Admin panel ---------- */
+#adminPanel{display:none;position:fixed;inset:0;z-index:100;background:var(--bg);overflow-y:auto;padding:16px 14px 40px}
+#adminPanel.open{display:block}
+.ap-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ap-head h2{margin:0;font-size:19px}
+.ap-close{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center}
+.ap-item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+.ap-item .row{display:flex;gap:8px;margin-bottom:8px}
+.ap-item input,.ap-item select{height:44px;border:1.5px solid var(--line);border-radius:10px;padding:0 10px;font-size:14px;width:100%;color:var(--text);background:#fff}
+.ap-item .grow{flex:1}
+.ap-btns{display:flex;gap:8px}
+.ap-btns button{flex:1;min-height:44px;border-radius:10px;border:0;font-weight:700;cursor:pointer;font-size:14px}
+.ap-save{background:var(--primary);color:#fff}
+.ap-del{background:var(--danger);color:#fff;flex:.6!important}
+.ap-add{width:100%;min-height:52px;border-radius:12px;border:2px dashed var(--primary);background:transparent;color:var(--primary);font-weight:800;font-size:15px;cursor:pointer;margin-top:6px}
+.ap-foot{display:flex;gap:8px;margin-top:14px}
+.ap-foot button{flex:1;min-height:52px;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer;border:0}
+.ap-reset{background:#eee;color:#333}
+.ap-done{background:var(--primary);color:#fff}
+.ap-note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5}
+
+footer{text-align:center;padding:22px 16px 8px;color:var(--muted);font-size:13px}
+footer .fn{font-weight:800;color:var(--text)}
+</style>
+</head>
+<body>
+
+<!-- Demo switcher — ONLY shown when URL contains ?demo -->
+<div id="demoBar">
+  <span>Demo:</span>
+  <button class="d1" id="demoBiryaniBtn">Al-Madina Biryani House</button>
+  <button class="d2" id="demoBurgerBtn">Burger Lab</button>
+</div>
+
+<header class="hdr">
+  <div class="hdr-row">
+    <div class="badge" id="logoBadge">M</div>
+    <div>
+      <h1 id="restName">Restaurant</h1>
+      <p class="tag" id="restTag"></p>
+    </div>
+    <button class="gear" id="gearBtn" aria-label="Admin settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="search-wrap">
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+    <input id="searchInput" type="search" placeholder="Search / Talaash karein…" autocomplete="off">
+  </div>
+</div>
+
+<nav class="cats" id="catTabs" aria-label="Categories"></nav>
+<main id="menuList"></main>
+
+<!-- Admin panel -->
+<div id="adminPanel">
+  <div class="ap-head">
+    <h2>Menu Settings</h2>
+    <button class="ap-close" id="apClose" aria-label="Close"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+  </div>
+  <div id="apList"></div>
+  <button class="ap-add" id="apAdd">+ Add New Item / Nayi dish shamil karein</button>
+  <div class="ap-foot">
+    <button class="ap-reset" id="apReset">Reset to Default</button>
+    <button class="ap-done" id="apDone">Done</button>
+  </div>
+  <p class="ap-note">Changes save on this device automatically. Reset wapas original menu par le aata hai.</p>
+</div>
+
+<!-- Sticky cart -->
+<div class="cartbar">
+  <div class="cartlist" id="cartList"></div>
+  <div class="tbl-row">
+    <label>Table No.<span class="helper">Table number muntakhib karein</span></label>
+    <select id="tableSel"></select>
+  </div>
+  <div class="total-line"><span id="cartCountLine">0 items</span><span id="cartTotalLine">Rs 0</span></div>
+  <button class="wa-btn" id="waOrderBtn">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.5 0 1.47 1.07 2.9 1.22 3.1.15.2 2.1 3.2 5.1 4.49.71.31 1.27.49 1.7.63.72.23 1.37.2 1.88.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35M12.04 2C6.56 2 2.1 6.45 2.1 11.93c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.48 0 9.93-4.45 9.93-9.93 0-2.65-1.03-5.14-2.9-7.01A9.86 9.86 0 0 0 12.04 2"/></svg>
+    <span>WhatsApp par Order Karein<span class="sub">Apna order WhatsApp par bhejein</span></span>
+  </button>
+  <div class="cart-empty-hint" id="cartHint">Koi item muntakhib karein — phir order bhejein</div>
+</div>
+
+<footer>
+  <div class="fn" id="footName"></div>
+  <div id="footWa"></div>
+</footer>
+
+<script>
+"use strict";
+/* ############################################################################################
+   ############################################################################################
+   ##                                                                                        ##
+   ##   *** CLIENT CONFIG — EDIT THESE LINES FOR EVERY NEW CLIENT ***                        ##
+   ##                                                                                        ##
+   ##   Har naye client ke liye sirf isi block ki values badlein:                             ##
+   ##     1. restaurantName, tagline, logo                                                    ##
+   ##     2. colors (primary, accent, background, text)                                       ##
+   ##     3. whatsapp  — client ka WhatsApp number, country code ke saath, bina + ke         ##
+   ##                    masalan "923001234567" (92 = Pakistan)                               ##
+   ##     4. currency, tableCount, adminPassword                                              ##
+   ##     5. categories — menu sections ki list                                               ##
+   ##     6. items — har dish: { name, desc, price, category, popular? }                      ##
+   ##                                                                                        ##
+   ##   Baqi file me kuch nahi badalna — sab automatic apply ho jayega.                      ##
+   ##                                                                                        ##
+   ############################################################################################
+   ############################################################################################ */
+const CONFIG = {
+  restaurantName: "Al-Madina Biryani House",          // client ka restaurant naam
+  tagline: "Asli desi zaika — karahi se naan tak",    // naam ke neeche choti line
+  logo: "",                                           // logo image ka path, masalan "logo.png" — khaali "" ho to naam ka pehla harf dikhega
+  colors: {
+    primary: "#1b6b3a",      // main theme color (header, buttons)
+    accent: "#c9a227",       // golden highlights / popular badges
+    background: "#f6f4ee",   // page background
+    text: "#1e1e1e"          // main text color
+  },
+  whatsapp: "923001234567",   // client ka WhatsApp number (country code ke saath)
+  currency: "Rs",             // price ke saath currency
+  tableCount: 12,             // kitni tables hain (1 se tableCount tak dropdown)
+  adminPassword: "admin123",  // menu edit karne ka password — CLIENT KO DEIN AUR BADAL DEIN
+  categories: ["Biryani", "Karahi & Handi", "Kebab & BBQ", "Naan & Roti", "Drinks & Desserts"],
+  items: [
+    { name: "Chicken Biryani", desc: "Dum wali masaledar biryani, raita aur salad ke saath", price: 300, category: "Biryani", popular: true },
+    { name: "Beef Biryani", desc: "Naram beef boti, aloo aur hara masala", price: 380, category: "Biryani", popular: true },
+    { name: "Chicken Tikka Biryani", desc: "Smoky tikka boti wali special biryani", price: 350, category: "Biryani" },
+    { name: "Sindhi Biryani", desc: "Teekhi aloo-bukharay wali asli Sindhi biryani", price: 320, category: "Biryani" },
+    { name: "Family Biryani Deg", desc: "4-5 afraad ke liye deg, raita salad included", price: 1200, category: "Biryani" },
+    { name: "Chicken Karahi (Half)", desc: "Desi ghee me bani, adrak aur hari mirch ke saath", price: 650, category: "Karahi & Handi", popular: true },
+    { name: "Chicken Karahi (Full)", desc: "Poori karahi 3-4 afraad ke liye", price: 1250, category: "Karahi & Handi" },
+    { name: "Mutton Karahi (Half)", desc: "Naram mutton, tamatar aur kali mirch ka tarka", price: 1100, category: "Karahi & Handi" },
+    { name: "Chicken Handi", desc: "Creamy makhani gravy me chicken", price: 700, category: "Karahi & Handi" },
+    { name: "Daal Fry", desc: "Tarka daal, desi style", price: 250, category: "Karahi & Handi" },
+    { name: "Chicken Tikka", desc: "Angaar par seeki hui, imli chutney ke saath", price: 280, category: "Kebab & BBQ", popular: true },
+    { name: "Seekh Kebab (4 pcs)", desc: "Naram reshaydar kebab, pyaz aur lemon ke saath", price: 350, category: "Kebab & BBQ" },
+    { name: "Malai Boti", desc: "Creamy aur naram chicken boti", price: 400, category: "Kebab & BBQ" },
+    { name: "Chicken Chargha", desc: "Steam + fry, khasta aur juicy — advance order", price: 950, category: "Kebab & BBQ" },
+    { name: "Naan", desc: "Tandoor ka garam khasta naan", price: 40, category: "Naan & Roti" },
+    { name: "Roghni Naan", desc: "Til wala naram roghni naan", price: 60, category: "Naan & Roti" },
+    { name: "Chapati", desc: "Ghar jaisi naram chapati", price: 25, category: "Naan & Roti" },
+    { name: "Fresh Lime Soda", desc: "Thanda meetha/namak wala soda", price: 150, category: "Drinks & Desserts" },
+    { name: "Cold Drink", desc: "Regular bottle", price: 120, category: "Drinks & Desserts" },
+    { name: "Kheer", desc: "Desi doodh wali meethi kheer", price: 150, category: "Drinks & Desserts" }
+  ]
+};
+
+/* --------------------------------------------------------------------------------------------
+   DEMO CONFIGS — sirf ?demo wale URL par dikhte hain. Client copy me inka koi asar nahi.
+   -------------------------------------------------------------------------------------------- */
+const DEMO_BURGER = {
+  restaurantName: "Burger Lab",
+  tagline: "Smash. Stack. Devour.",
+  logo: "",
+  colors: { primary: "#b3261e", accent: "#f5a623", background: "#141414", text: "#f5f5f5" },
+  whatsapp: "923001234567",
+  currency: "Rs",
+  tableCount: 10,
+  adminPassword: "admin123",
+  categories: ["Smash Burgers", "Fries & Sides", "Shakes", "Deals"],
+  items: [
+    { name: "Classic Smash Burger", desc: "Double smashed patty, cheddar, house sauce", price: 550, category: "Smash Burgers", popular: true },
+    { name: "Zinger Burger", desc: "Crispy fried fillet, mayo, lettuce", price: 480, category: "Smash Burgers", popular: true },
+    { name: "Beef Jalapeno Burger", desc: "Beef patty, jalapenos, pepper jack cheese", price: 720, category: "Smash Burgers" },
+    { name: "Chicken Grilled Burger", desc: "Grilled fillet, light mayo, whole wheat bun", price: 520, category: "Smash Burgers" },
+    { name: "Double Trouble", desc: "Two patties, double cheese, double sauce", price: 850, category: "Smash Burgers" },
+    { name: "Mushroom Swiss Burger", desc: "Sauteed mushrooms, swiss cheese, garlic aioli", price: 780, category: "Smash Burgers" },
+    { name: "Regular Fries", desc: "Golden crispy fries, salted", price: 250, category: "Fries & Sides" },
+    { name: "Loaded Fries", desc: "Cheese sauce, chicken chunks, jalapenos", price: 450, category: "Fries & Sides", popular: true },
+    { name: "Masala Fries", desc: "Desi masala dusted fries", price: 300, category: "Fries & Sides" },
+    { name: "Chicken Wings (6 pcs)", desc: "Tossed in buffalo or BBQ sauce", price: 550, category: "Fries & Sides" },
+    { name: "Nuggets (8 pcs)", desc: "Crispy chicken nuggets with dip", price: 400, category: "Fries & Sides" },
+    { name: "Oreo Shake", desc: "Thick blended Oreo milkshake", price: 450, category: "Shakes", popular: true },
+    { name: "Chocolate Fudge Shake", desc: "Rich chocolate, whipped cream", price: 480, category: "Shakes" },
+    { name: "Mango Shake", desc: "Seasonal fresh mango shake", price: 400, category: "Shakes" },
+    { name: "Solo Deal", desc: "Any classic burger + fries + drink", price: 750, category: "Deals", popular: true },
+    { name: "Duo Deal", desc: "2 zingers + 2 fries + 2 drinks", price: 1400, category: "Deals" },
+    { name: "Family Bucket", desc: "4 burgers + large loaded fries + 4 drinks", price: 2600, category: "Deals" },
+    { name: "Midnight Munchies", desc: "Loaded fries + wings + 2 shakes", price: 1100, category: "Deals" }
+  ]
+};
+
+/* ############################################################################################
+   APP CODE — neeche kuch nahi badalna.
+   ############################################################################################ */
+
+const $ = (id) => document.getElementById(id);
+const qs = new URLSearchParams(location.search);
+
+/* ---- pick active config: ?demo=burger switches demo, plain ?demo shows the switcher ---- */
+let baseConfig = CONFIG;
+let demoMode = qs.get("demo");
+if (demoMode === "burger" || demoMode === "2") baseConfig = DEMO_BURGER;
+else if (demoMode === "biryani" || demoMode === "1" || demoMode === "") baseConfig = CONFIG;
+
+const LS_KEY = "qrmenu-overrides-" + baseConfig.restaurantName.replace(/\s+/g, "-").toLowerCase();
+function loadOverrides() {
+  try { const raw = localStorage.getItem(LS_KEY); return raw ? JSON.parse(raw) : null; }
+  catch (e) { return null; }
+}
+function saveOverrides(items) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(items)); } catch (e) {}
+}
+let items = loadOverrides() || JSON.parse(JSON.stringify(baseConfig.items));
+const cfg = () => baseConfig;
+
+/* ---- apply theme + header + title + footer ---- */
+function applyBrand() {
+  const c = cfg();
+  const r = document.documentElement.style;
+  r.setProperty("--primary", c.colors.primary);
+  r.setProperty("--accent", c.colors.accent);
+  r.setProperty("--bg", c.colors.background);
+  r.setProperty("--text", c.colors.text);
+  document.title = c.restaurantName;
+  $("restName").textContent = c.restaurantName;
+  $("restTag").textContent = c.tagline || "";
+  const badge = $("logoBadge");
+  badge.innerHTML = "";
+  if (c.logo) {
+    const im = document.createElement("img");
+    im.src = c.logo; im.alt = c.restaurantName;
+    badge.appendChild(im);
+  } else {
+    badge.textContent = (c.restaurantName || "M").trim().charAt(0).toUpperCase();
+  }
+  $("footName").textContent = c.restaurantName;
+  $("footWa").textContent = "WhatsApp: " + c.whatsapp;
+  // dark background → light cards
+  const dark = isDark(c.colors.background);
+  r.setProperty("--card", dark ? "#1f1f1f" : "#ffffff");
+  r.setProperty("--line", dark ? "#333333" : "#e8e4d8");
+  r.setProperty("--muted", dark ? "#a8a8a8" : "#6b6b6b");
+}
+function isDark(hex) {
+  const h = hex.replace("#", "");
+  if (h.length !== 6) return false;
+  const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+  return (0.299*r + 0.587*g + 0.114*b) < 128;
+}
+
+/* ---- state ---- */
+const cart = {};           // itemIndex -> qty
+let activeCat = "All";
+let searchTerm = "";
+
+/* ---- SVG icons ---- */
+const ICO = {
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+  minus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>'
+};
+
+/* ---- render categories ---- */
+function renderCats() {
+  const nav = $("catTabs");
+  nav.innerHTML = "";
+  const all = ["All"].concat(cfg().categories);
+  all.forEach((cat) => {
+    const b = document.createElement("button");
+    b.className = "cat" + (cat === activeCat ? " active" : "");
+    b.textContent = cat;
+    b.addEventListener("click", () => { activeCat = cat; renderCats(); renderMenu(); });
+    nav.appendChild(b);
+  });
+}
+
+/* ---- render menu ---- */
+function renderMenu() {
+  const list = $("menuList");
+  list.innerHTML = "";
+  const q = searchTerm.trim().toLowerCase();
+  const groups = {};
+  items.forEach((it, idx) => {
+    if (activeCat !== "All" && it.category !== activeCat) return;
+    if (q && !(it.name.toLowerCase().includes(q) || (it.desc||"").toLowerCase().includes(q))) return;
+    (groups[it.category] = groups[it.category] || []).push({ it, idx });
+  });
+  const catsInOrder = cfg().categories.filter(c => groups[c]);
+  if (!catsInOrder.length) {
+    list.innerHTML = '<div class="empty">Kuch nahi mila — kuch aur talaash karein.</div>';
+    return;
+  }
+  catsInOrder.forEach((cat) => {
+    const h = document.createElement("div");
+    h.className = "sec-title";
+    h.innerHTML = '<span class="dot"></span>' + escapeHtml(cat);
+    list.appendChild(h);
+    groups[cat].forEach(({ it, idx }) => {
+      const card = document.createElement("div");
+      card.className = "item";
+      card.innerHTML =
+        '<div class="item-top"><div><p class="item-name">' + escapeHtml(it.name) +
+        (it.popular ? '<span class="pop">Popular</span>' : '') + '</p>' +
+        (it.desc ? '<p class="item-desc">' + escapeHtml(it.desc) + '</p>' : '') + '</div></div>' +
+        '<div class="item-row"><span class="price">' + escapeHtml(cfg().currency) + ' ' + Number(it.price).toLocaleString() + '</span>' +
+        '<div class="stepper">' +
+        '<button class="minus" data-a="dec" data-i="' + idx + '" aria-label="Kam karein">' + ICO.minus + '</button>' +
+        '<span class="qty" id="qty-' + idx + '">' + (cart[idx] || 0) + '</span>' +
+        '<button data-a="inc" data-i="' + idx + '" aria-label="Zyada karein">' + ICO.plus + '</button>' +
+        '</div></div>';
+      list.appendChild(card);
+    });
+  });
+  list.querySelectorAll(".stepper button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const i = Number(btn.getAttribute("data-i"));
+      const a = btn.getAttribute("data-a");
+      cart[i] = (cart[i] || 0) + (a === "inc" ? 1 : -1);
+      if (cart[i] <= 0) delete cart[i];
+      const qel = $("qty-" + i);
+      if (qel) qel.textContent = cart[i] || 0;
+      renderCart();
+    });
+  });
+}
+function escapeHtml(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, (m) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[m]));
+}
+
+/* ---- cart ---- */
+function cartTotals() {
+  let count = 0, total = 0;
+  Object.keys(cart).forEach((i) => {
+    const q = cart[i], it = items[Number(i)];
+    if (it && q > 0) { count += q; total += q * Number(it.price); }
+  });
+  return { count, total };
+}
+function renderCart() {
+  const { count, total } = cartTotals();
+  $("cartCountLine").textContent = count + (count === 1 ? " item" : " items");
+  $("cartTotalLine").textContent = cfg().currency + " " + total.toLocaleString();
+  $("cartHint").style.display = count ? "none" : "block";
+  const cl = $("cartList");
+  cl.innerHTML = "";
+  const keys = Object.keys(cart);
+  if (!keys.length) { cl.classList.remove("open"); return; }
+  cl.classList.add("open");
+  keys.forEach((i) => {
+    const it = items[Number(i)], q = cart[i];
+    if (!it) return;
+    const row = document.createElement("div");
+    row.className = "cl";
+    row.innerHTML = '<span>' + q + ' x ' + escapeHtml(it.name) + '</span><span><b>' + escapeHtml(cfg().currency) + ' ' + (q * Number(it.price)).toLocaleString() + '</b></span>';
+    cl.appendChild(row);
+  });
+}
+
+/* ---- table selector ---- */
+function renderTables() {
+  const sel = $("tableSel");
+  sel.innerHTML = "";
+  const n = Number(cfg().tableCount) || 10;
+  for (let t = 1; t <= n; t++) {
+    const o = document.createElement("option");
+    o.value = t; o.textContent = t;
+    sel.appendChild(o);
+  }
+  const pre = parseInt(qs.get("table"), 10);
+  if (pre >= 1 && pre <= n) sel.value = pre;
+}
+
+/* ---- WhatsApp order ---- */
+function buildOrderText() {
+  const c = cfg();
+  const table = $("tableSel").value;
+  const lines = ["Assalam o Alaikum!", "", "New Order — " + c.restaurantName, "Table No: " + table, ""];
+  let total = 0;
+  Object.keys(cart).forEach((i) => {
+    const it = items[Number(i)], q = cart[i];
+    if (!it || q <= 0) return;
+    const amt = q * Number(it.price);
+    total += amt;
+    lines.push(q + " x " + it.name + " — " + c.currency + " " + amt.toLocaleString());
+  });
+  lines.push("", "Total: " + c.currency + " " + total.toLocaleString(), "", "Shukriya!");
+  return lines.join("\n");
+}
+$("waOrderBtn").addEventListener("click", () => {
+  const { count } = cartTotals();
+  if (!count) { alert("Pehle koi item muntakhib karein / Please add items first."); return; }
+  const url = "https://wa.me/" + cfg().whatsapp + "?text=" + encodeURIComponent(buildOrderText());
+  window.open(url, "_blank");
+});
+
+/* ---- search ---- */
+$("searchInput").addEventListener("input", (e) => {
+  searchTerm = e.target.value;
+  renderMenu();
+});
+
+/* ---- demo switcher ---- */
+if (qs.has("demo")) {
+  $("demoBar").classList.add("show");
+  $("demoBiryaniBtn").addEventListener("click", () => { location.search = "?demo=biryani"; });
+  $("demoBurgerBtn").addEventListener("click", () => { location.search = "?demo=burger"; });
+}
+
+/* ---- admin ---- */
+$("gearBtn").addEventListener("click", () => {
+  const pw = prompt("Admin password / Password likhein:");
+  if (pw === null) return;
+  if (pw !== cfg().adminPassword) { alert("Ghalat password / Wrong password."); return; }
+  openAdmin();
+});
+function openAdmin() {
+  renderAdminList();
+  $("adminPanel").classList.add("open");
+}
+$("apClose").addEventListener("click", () => { $("adminPanel").classList.remove("open"); refreshAll(); });
+$("apDone").addEventListener("click", () => { $("adminPanel").classList.remove("open"); refreshAll(); });
+$("apAdd").addEventListener("click", () => {
+  items.push({ name: "New Item", desc: "", price: 0, category: cfg().categories[0] || "General" });
+  saveOverrides(items); renderAdminList();
+});
+$("apReset").addEventListener("click", () => {
+  if (!confirm("Reset to default menu? / Wapas original menu karein?")) return;
+  localStorage.removeItem(LS_KEY);
+  items = JSON.parse(JSON.stringify(baseConfig.items));
+  for (const k in cart) delete cart[k];
+  renderAdminList();
+});
+function renderAdminList() {
+  const wrap = $("apList");
+  wrap.innerHTML = "";
+  const cats = cfg().categories;
+  items.forEach((it, idx) => {
+    const d = document.createElement("div");
+    d.className = "ap-item";
+    d.innerHTML =
+      '<div class="row"><input class="grow" data-f="name" data-i="' + idx + '" value="' + escapeHtml(it.name) + '" placeholder="Name"></div>' +
+      '<div class="row"><input class="grow" data-f="desc" data-i="' + idx + '" value="' + escapeHtml(it.desc || "") + '" placeholder="Description"></div>' +
+      '<div class="row"><input data-f="price" data-i="' + idx + '" type="number" min="0" value="' + Number(it.price) + '" placeholder="Price" style="max-width:120px">' +
+      '<select data-f="category" data-i="' + idx + '">' + cats.map(c => '<option' + (c === it.category ? ' selected' : '') + '>' + escapeHtml(c) + '</option>').join("") + '</select></div>' +
+      '<div class="ap-btns"><button class="ap-save" data-i="' + idx + '">Save</button><button class="ap-del" data-i="' + idx + '">Delete</button></div>';
+    wrap.appendChild(d);
+  });
+  wrap.querySelectorAll(".ap-save").forEach((b) => b.addEventListener("click", () => {
+    const i = Number(b.getAttribute("data-i"));
+    wrap.querySelectorAll('[data-i="' + i + '"]').forEach((inp) => {
+      const f = inp.getAttribute("data-f");
+      if (f === "price") items[i][f] = Number(inp.value) || 0;
+      else items[i][f] = inp.value;
+    });
+    saveOverrides(items);
+    b.textContent = "Saved";
+    setTimeout(() => { b.textContent = "Save"; }, 1200);
+  }));
+  wrap.querySelectorAll(".ap-del").forEach((b) => b.addEventListener("click", () => {
+    if (!confirm("Delete this item?")) return;
+    const i = Number(b.getAttribute("data-i"));
+    items.splice(i, 1); delete cart[i];
+    saveOverrides(items); renderAdminList();
+  }));
+}
+function refreshAll() {
+  activeCat = "All"; renderCats(); renderMenu(); renderCart();
+}
+
+/* ---- boot ---- */
+applyBrand();
+renderCats();
+renderMenu();
+renderTables();
+renderCart();
+</script>
+</body>
+</html>
